@@ -1,0 +1,58 @@
+@page "/estudiantes"
+@using Aplicada1_2026_1.Models
+@using Aplicada1_2026_1.Data
+@using Microsoft.AspNetCore.Components.Forms
+@inject Context Db
+
+<h3>Registrar Estudiante</h3>
+
+<EditForm Model="nuevoEstudiante" OnValidSubmit="GuardarEstudiante">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="nuevoEstudiante.Nombre" />
+    </div>
+    <div>
+        <label>Apellido:</label>
+        <InputText @bind-Value="nuevoEstudiante.Apellido" />
+    </div>
+    <div>
+        <label>Email:</label>
+        <InputText @bind-Value="nuevoEstudiante.Email" />
+    </div>
+    <div>
+        <label>Fecha de Nacimiento:</label>
+        <InputDate @bind-Value="nuevoEstudiante.FechaNacimiento" />
+    </div>
+
+    <button type="submit">Registrar</button>
+</EditForm>
+
+<h4>Estudiantes Registrados</h4>
+<ul>
+    @foreach (var e in estudiantes)
+    {
+        <li>@e.Nombre @e.Apellido - @e.Email - @e.FechaNacimiento.ToShortDateString()</li>
+    }
+</ul>
+
+@code {
+    private Estudiante nuevoEstudiante = new();
+    private List<Estudiante> estudiantes = new();
+
+    protected override void OnInitialized()
+    {
+        estudiantes = Db.Estudiantes.ToList();
+    }
+
+    private void GuardarEstudiante()
+    {
+        Db.Estudiantes.Add(nuevoEstudiante);
+        Db.SaveChanges();
+        estudiantes = Db.Estudiantes.ToList();
+        nuevoEstudiante = new Estudiante();
+    }
+}
+
