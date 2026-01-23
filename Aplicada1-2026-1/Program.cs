@@ -2,7 +2,7 @@ using Aplicada1_2026_1.Data;
 using Microsoft.EntityFrameworkCore;
 
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
