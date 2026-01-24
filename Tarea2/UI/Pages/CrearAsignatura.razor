@@ -1,0 +1,27 @@
+﻿@page "/asignaturas/crear"
+@inject AsignaturaService Service
+
+<h3>Registro de Asignaturas</h3>
+
+<EditForm Model="model" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="model.Codigo" placeholder="Código" class="form-control" />
+    <InputText @bind-Value="model.Nombre" placeholder="Nombre" class="form-control" />
+    <InputText @bind-Value="model.Aula" placeholder="Aula" class="form-control" />
+    <InputNumber @bind-Value="model.Creditos" class="form-control" />
+
+    <button class="btn btn-primary mt-2">Guardar</button>
+</EditForm>
+
+@code {
+    Asignatura model = new();
+
+    async Task Guardar()
+    {
+        await Service.CrearAsync(model);
+        model = new();
+    }
+}
+

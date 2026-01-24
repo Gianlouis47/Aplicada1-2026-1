@@ -1,0 +1,33 @@
+﻿@page "/asignaturas/editar/{id:int}"
+@inject AsignaturaService Service
+@inject NavigationManager Nav
+
+<h3>Editar Asignatura</h3>
+
+<EditForm Model="model" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="model.Codigo" />
+    <InputText @bind-Value="model.Nombre" />
+    <InputText @bind-Value="model.Aula" />
+    <InputNumber @bind-Value="model.Creditos" />
+
+    <button type="submit">Actualizar</button>
+</EditForm>
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Asignatura model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        model = await Service.ObtenerPorIdAsync(id);
+    }
+
+    private async Task Actualizar()
+    {
+        await Service.ActualizarAsync(model);
+        Nav.NavigateTo("/asignaturas");
+    }
+}

@@ -1,0 +1,69 @@
+﻿@page "/asignaturas"
+@inject Application.Interfaces.IAsignaturaService AsignaturaService
+@inject NavigationManager Nav
+
+<h3>Asignaturas Registradas</h3>
+
+<div class="mb-2">
+    <input type="text" placeholder="Buscar..." @bind="filtro" class="form-control" />
+    <button class="btn btn-primary mt-1" @onclick="CargarAsignaturas">Filtrar</button>
+    <button class="btn btn-success mt-1" @onclick="Nuevo">Nueva Asignatura</button>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Aula</th>
+            <th>Créditos</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in asignaturas)
+        {
+            <tr>
+                <td>@a.Codigo</td>
+                <td>@a.Nombre</td>
+                <td>@a.Aula</td>
+                <td>@a.Creditos</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" @onclick="() => Editar(a.AsignaturaId)">Modificar</button>
+                    <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(a.AsignaturaId)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Tarea2.Domain.Entities.Asignatura> asignaturas = new();
+    private string filtro = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarAsignaturas();
+    }
+
+    private async Task CargarAsignaturas()
+    {
+        asignaturas = await AsignaturaService.GetAllAsync(filtro);
+    }
+
+    private void Nuevo()
+    {
+        Nav.NavigateTo("/asignaturas/crear");
+    }
+
+    private void Editar(int id)
+    {
+        Nav.NavigateTo($"/asignaturas/editar/{id}");
+    }
+
+    private async Task Eliminar(int id)
+    {
+        await AsignaturaService.DeleteAsync(id);
+        await CargarAsignaturas();
+    }
+}
