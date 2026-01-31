@@ -1,0 +1,224 @@
+﻿@page "/tipospuntos"
+@inject TiposPuntosService Service
+@inject NavigationManager Nav
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span class="card-header-title">Registro de Tipos de Puntos</span>
+
+        <button class="btn btn-primary" @onclick="Crear">
+            <i class="bi bi-plus-lg me-1"></i> Crear
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-4 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Filtrar por</label>
+                <select class="form-select" @bind="filtroCampo">
+                    <option value="">Elija una opción</option>
+                    <option value="Nombre">Nombre</option>
+                    <option value="Descripcion">Descripción</option>
+                    <option value="ValorPuntos">Valor Puntos</option>
+                    <option value="Color">Color</option>
+                    <option value="Icono">Icono</option>
+                    <option value="Activo">Activo</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Búsqueda</label>
+                <div class="input-group">
+                    <input class="form-control" placeholder="Buscar" @bind="busqueda" />
+                    <button class="btn btn-outline-primary" type="button" @onclick="Buscar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        @if (!string.IsNullOrWhiteSpace(mensaje))
+        {
+            <div class="alert alert-info">@mensaje</div>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>TipoId</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Valor</th>
+                        <th>Color</th>
+                        <th>Icono</th>
+                        <th>Activo</th>
+                        <th class="text-center">Opciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (lista.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                No hay registros.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var x in lista)
+                        {
+                            <tr>
+                                <td>@x.TipoId</td>
+                                <td>@x.Nombre</td>
+                                <td>@x.Descripcion</td>
+                                <td>@x.ValorPuntos</td>
+                                <td>@x.Color</td>
+                                <td>@x.Icono</td>
+                                <td>@(x.Activo ? "Sí" : "No")</td>
+                                <td class="text-center">
+                                    <button class="btn btn-outline-primary btn-icon me-2"
+                                            title="Editar"
+                                            @onclick="() => Editar(x.TipoId)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-danger btn-icon"
+                                            title="Eliminar"
+                                            @onclick="() => ConfirmarEliminar(x.TipoId)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <div><span class="fw-semibold">Cantidad:</span> @lista.Count</div>
+        <div><span class="fw-semibold">Total Puntos:</span> @lista.Sum(x => x.ValorPuntos)</div>
+    </div>
+</div>
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" @onclick="CancelarEliminar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Seguro que deseas eliminar este tipo de puntos?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarEliminar">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="EliminarConfirmado">
+                        <i class="bi bi-trash me-1"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string? filtroCampo = "";
+    private string? busqueda = "";
+    private string? mensaje;
+
+    private List<TiposPuntos> lista = new();
+
+    private bool mostrarConfirmacion;
+    private int idAEliminar;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lista = await CargarBase();
+    }
+
+    private void Crear() => Nav.NavigateTo("/tipospuntos/crear");
+    private void Editar(int id) => Nav.NavigateTo($"/tipospuntos/editar/{id}");
+
+    private async Task Buscar()
+    {
+        mensaje = null;
+        var all = await CargarBase();
+        lista = Filtrar(all, filtroCampo, busqueda);
+
+        if (lista.Count == 0)
+            mensaje = "No se encontraron resultados con ese filtro/búsqueda.";
+    }
+
+    private void ConfirmarEliminar(int id)
+    {
+        idAEliminar = id;
+        mostrarConfirmacion = true;
+    }
+
+    private void CancelarEliminar()
+    {
+        mostrarConfirmacion = false;
+        idAEliminar = 0;
+    }
+
+    private async Task EliminarConfirmado()
+    {
+        await Service.Eliminar(idAEliminar);
+        CancelarEliminar();
+        lista = await CargarBase();
+    }
+
+    private async Task<List<TiposPuntos>> CargarBase()
+    {
+        mensaje = null;
+        return await Service.Listar();
+    }
+
+    private static List<TiposPuntos> Filtrar(List<TiposPuntos> src, string? campo, string? term)
+    {
+        if (string.IsNullOrWhiteSpace(term))
+            return src;
+
+        var t = term.Trim();
+
+        if (string.IsNullOrWhiteSpace(campo) || campo == "Nombre")
+            return src.Where(x => x.Nombre.Contains(t, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (campo == "Descripcion")
+            return src.Where(x => x.Descripcion.Contains(t, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (campo == "Color")
+            return src.Where(x => x.Color.Contains(t, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (campo == "Icono")
+            return src.Where(x => x.Icono.Contains(t, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (campo == "ValorPuntos")
+        {
+            if (!int.TryParse(t, out var v)) return new();
+            return src.Where(x => x.ValorPuntos == v).ToList();
+        }
+
+        if (campo == "Activo")
+        {
+            if (t.Equals("si", StringComparison.OrdinalIgnoreCase) || t.Equals("sí", StringComparison.OrdinalIgnoreCase) || t.Equals("true", StringComparison.OrdinalIgnoreCase))
+                return src.Where(x => x.Activo).ToList();
+
+            if (t.Equals("no", StringComparison.OrdinalIgnoreCase) || t.Equals("false", StringComparison.OrdinalIgnoreCase))
+                return src.Where(x => !x.Activo).ToList();
+
+            return new();
+        }
+
+        return src;
+    }
+}

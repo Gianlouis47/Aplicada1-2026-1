@@ -1,16 +1,17 @@
 ﻿@namespace Tarea2.Components.Layout
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Tarea 2</a>
+<div class="brand px-3 py-3">
+    <span class="brand-title">RegistroAsignaturas</span>
+</div>
 
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/asignaturas">Asignaturas</NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/asignaturas/crear">Registrar</NavLink>
-            </li>
-        </ul>
-    </div>
-</nav>
+<div class="nav px-2">
+    <NavLink class="nav-item" href="/asignaturas" Match="NavLinkMatch.All">
+        <span class="icon">📘</span>
+        <span>Asignaturas</span>
+    </NavLink>
+
+    <NavLink class="nav-item" href="/asignaturas/crear">
+        <span class="icon">＋</span>
+        <span>Nueva Asignatura</span>
+    </NavLink>
+</div>

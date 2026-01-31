@@ -12,7 +12,6 @@
   <ItemGroup>
     <Folder Include="Components\DAL\" />
     <Folder Include="Components\Infrastructure\" />
-    <Folder Include="Components\Services\" />
   </ItemGroup>
 
   <ItemGroup>

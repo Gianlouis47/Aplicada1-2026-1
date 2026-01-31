@@ -1,20 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tarea2.Domain.Entities;
 
-namespace Tarea2.Infrastructure.Data
+namespace Tarea2.Infrastructure.Data;
+
+public class ApplicationDbContext : DbContext
 {
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+    public DbSet<Asignatura> Asignaturas => Set<Asignatura>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
+        base.OnModelCreating(modelBuilder);
 
-        public DbSet<Asignatura> Asignaturas => Set<Asignatura>();
+        modelBuilder.Entity<Asignatura>()
+            .ToTable("Asignaturas");
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Asignatura>()
-                .HasIndex(a => a.Nombre)
-                .IsUnique(); 
-        }
+        modelBuilder.Entity<Asignatura>()
+            .HasIndex(x => x.Nombre)
+            .IsUnique();
     }
 }

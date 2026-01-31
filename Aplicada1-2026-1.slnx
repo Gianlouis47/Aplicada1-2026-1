@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="Aplicada1-2026-1/Aplicada1-2026-1.csproj" />
+  <Project Path="Tarea2/Tarea2.csproj" Id="7b97ef93-9166-44fb-acdf-b3e273467d44" />
+  <Project Path="Tarea3/Tarea3.csproj" Id="50fa04e5-e7b0-4cc2-95b4-3b5137b3452e" />
 </Solution>

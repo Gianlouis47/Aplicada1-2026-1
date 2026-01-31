@@ -1,12 +1,14 @@
 ﻿@using Tarea2.Components.Layout
 
-<Router AppAssembly="@typeof(App).Assembly">
+<Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+
     <NotFound>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p>No encontrado</p>
+            <p>Página no encontrada.</p>
         </LayoutView>
     </NotFound>
 </Router>
