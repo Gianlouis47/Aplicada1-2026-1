@@ -1,0 +1,28 @@
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+main {
+    flex: 1;
+    overflow: auto;
+}
+
+.sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #0b1b3a 0%, #2a0057 100%);
+}
+
+.top-row {
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: #ffffff;
+}
+
+.content {
+    padding-top: 1.5rem;
+}

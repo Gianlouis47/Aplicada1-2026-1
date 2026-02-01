@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aplicada1_2026_1.Data
 {
     public class ContextFactory : IDesignTimeDbContextFactory<Context>
     {
+        
         public Context CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<Context>();

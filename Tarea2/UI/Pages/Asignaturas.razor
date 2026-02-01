@@ -1,0 +1,177 @@
+﻿@page "/asignaturas"
+@inject Tarea2.Application.Services.AsignaturaService Service
+@inject NavigationManager Nav
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h4 class="mb-0">Registro de Asignaturas</h4>
+
+        <button class="btn btn-primary" @onclick="Crear">
+            <i class="bi bi-plus-lg me-1"></i> Crear
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-4 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Filtrar por</label>
+                <select class="form-select" @bind="filtroCampo">
+                    <option value="">Elija una opción</option>
+                    <option value="Nombre">Nombre</option>
+                    <option value="Codigo">Código</option>
+                    <option value="Aula">Aula</option>
+                    <option value="Creditos">Créditos</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Búsqueda</label>
+                <div class="input-group">
+                    <input class="form-control" placeholder="Buscar" @bind="busqueda" />
+                    <button class="btn btn-outline-primary" type="button" @onclick="Buscar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        @if (!string.IsNullOrWhiteSpace(mensaje))
+        {
+            <div class="alert alert-info">@mensaje</div>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>AsignaturaId</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Aula</th>
+                        <th>Créditos</th>
+                        <th class="text-center">Opciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (lista.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No hay asignaturas registradas.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var a in lista)
+                        {
+                            <tr>
+                                <td>@a.AsignaturaId</td>
+                                <td>@a.Codigo</td>
+                                <td>@a.Nombre</td>
+                                <td>@a.Aula</td>
+                                <td>@a.Creditos</td>
+                                <td class="text-center">
+                                    <button class="btn btn-outline-primary btn-icon me-2"
+                                            title="Editar"
+                                            @onclick="() => Editar(a.AsignaturaId)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-danger btn-icon"
+                                            title="Eliminar"
+                                            @onclick="() => ConfirmarEliminar(a.AsignaturaId)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <div><span class="fw-semibold">Cantidad:</span> @lista.Count</div>
+        <div><span class="fw-semibold">Total Créditos:</span> @lista.Sum(x => x.Creditos)</div>
+    </div>
+</div>
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" @onclick="CancelarEliminar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Seguro que deseas eliminar esta asignatura?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarEliminar">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="EliminarConfirmado">
+                        <i class="bi bi-trash me-1"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string? filtroCampo = "";
+    private string? busqueda = "";
+    private string? mensaje;
+
+    private List<Tarea2.Domain.Entities.Asignatura> lista = new();
+
+    private bool mostrarConfirmacion;
+    private int idAEliminar;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Recargar();
+    }
+
+    private void Crear() => Nav.NavigateTo("/asignaturas/crear");
+    private void Editar(int id) => Nav.NavigateTo($"/asignaturas/editar/{id}");
+
+    private async Task Buscar()
+    {
+        mensaje = null;
+        lista = await Service.ListarAsync(filtroCampo, busqueda);
+        if (lista.Count == 0)
+            mensaje = "No se encontraron resultados con ese filtro/búsqueda.";
+    }
+
+    private void ConfirmarEliminar(int id)
+    {
+        idAEliminar = id;
+        mostrarConfirmacion = true;
+    }
+
+    private void CancelarEliminar()
+    {
+        mostrarConfirmacion = false;
+        idAEliminar = 0;
+    }
+
+    private async Task EliminarConfirmado()
+    {
+        await Service.EliminarAsync(idAEliminar);
+        CancelarEliminar();
+        await Recargar();
+    }
+
+    private async Task Recargar()
+    {
+        mensaje = null;
+        lista = await Service.ListarAsync(filtroCampo, busqueda);
+    }
+}

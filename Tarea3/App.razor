@@ -1,0 +1,15 @@
+﻿@namespace Tarea3
+@using Tarea3.Components.Layout
+
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p>Página no encontrada.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
